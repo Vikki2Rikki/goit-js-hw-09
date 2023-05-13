@@ -1,66 +1,58 @@
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+const formContaner = document.querySelector('form.form');
+formContaner.addEventListener('submit', onSubmit);
+
+const params = {};
+
+function onSubmit(evt) {
+  evt.preventDefault();
+  makeParams(evt);
+  createPromisesChain();
+}
+
+function makeParams(evt){
+  const formData = new FormData(evt.currentTarget);
+  formData.forEach((value, key) => {
+    params[key] = +value;
+    console.log(params);
+  });
+}
+
+function createPromisesChain() {
+  for (let i = 1; i <= params.amount; i += 1) {
+    createPromise(i, params.delay)
+    .then(({ position, delay }) => {
+      Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
+    })
+    .catch(({ position, delay }) => {
+      Notify.failure(`Rejected promise ${position} in ${delay}ms`);
+    });
+
+    params.delay += params.step;
+  }
+}
+
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-  } else {
-    // Reject
-  }
-}
 
-const formContaner = document.querySelector('.form');
-const delayContainer = document.querySelector('input[name="delay"]');
-const stepContaner = document.querySelector('input[name="step"]');
-const amountContaner = document.querySelector('input[name="amount"]');
-const btnContaner = document.querySelector('button');
-console.log(btnContaner);
-
-
-btnContaner.addEventListener('submit', createPromise);
-formContaner.addEventListener('input', onInputNumbers);
-
-function onInputNumbers(event){
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldResolve) {
+     resolve({ position, delay });
+      } else {
+       reject({ position, delay })
+      }
+      
+    }, delay);
+  })
   
-const delay = delayContainer.value;
-console.log(delay);
-
-  const step = stepContaner.value;
-  console.log(step);
-
-  const position = amountContaner.value;
-  console.log(position);
 }
 
 
-//  function createPromise(position, delay) {
-//   const shouldResolve = Math.random() > 0.3;
-//   if (shouldResolve) {
-//     // Fulfill
-//   } else {
-//     // Reject
-//   }
-// }
 
- 
-//  createPromise(2, 1500)
-//  .then(({ position, delay }) => {
-//    console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-//  })
-//  .catch(({ position, delay }) => {
-//    console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-//  });
 
-const promise = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    const val = Math.random();
-  if(val > 0.5){
-resolve('Yesss!!!');
-  } else {
-reject('Nooooo((((')
-  }
 
-  }, 2000)
-});
 
-console.log(promise);
 
-promise.then((value) => {console.log(value);}).catch((err) => {console.log(err);}).finally()
+
